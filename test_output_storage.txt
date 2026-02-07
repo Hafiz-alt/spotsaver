@@ -1,0 +1,68 @@
+﻿yarn run v1.22.22
+node.exe : warning 
+..\..\package.json: No 
+license field
+At C:\Program 
+Files\nodejs\npx.ps1:29 
+char:3
++   & $NODE_EXE 
+$NPX_CLI_JS $args
++   ~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~
+    + CategoryInfo        
+      : NotSpecified: (w  
+  arning ..\..\p...o li   
+ cense field:String) [    
+], RemoteException
+    + FullyQualifiedError 
+   Id : NativeCommandErr  
+  or
+ 
+$ jest src/services/__tests__/storage.test.ts
+FAIL src/services/__tests_
+_/storage.test.ts
+  ΓùÅ Test suite failed 
+to run
+
+    ReferenceError: You 
+are trying to `import` a 
+file outside of the scope 
+of the test code.
+
+      at 
+Runtime._execModule (node_
+modules/jest-runtime/build
+/index.js:1216:13)
+      at require (node_mod
+ules/expo/src/winter/runti
+me.native.ts:20:43)
+      at getValue (node_mo
+dules/expo/src/winter/inst
+allGlobal.ts:97:21)
+      at Object.get [as 
+__ExpoImportMetaRegistry] 
+(node_modules/expo/src/win
+ter/installGlobal.ts:44:16
+)
+
+Snapshot Summary
+ ΓÇ║ 1 snapshot file 
+obsolete from 1 test 
+suite. To remove it, run 
+`yarn test -u`.
+   Γå│   ΓÇó __tests__/__s
+napshots__/SaveButton.test
+.tsx.snap
+
+Test Suites: 1 failed, 1 
+total
+Tests:       0 total
+Snapshots:   1 file 
+obsolete, 0 total
+Time:        0.835 s
+Ran all test suites 
+matching src/services/__te
+sts__/storage.test.ts.
+error Command failed with 
+exit code 1.
+info Visit https://yarnpkg.com/en/docs/cli/run for documentation about this command.

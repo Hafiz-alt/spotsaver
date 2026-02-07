@@ -1,4 +1,17 @@
 # Memory Parking
+# SpotSaver
+
+Find Your Car. Beat the Clock. SpotSaver helps you remember where you parked and tracks your parking time.
+
+## Privacy & Data Usage
+SpotSaver is designed with privacy first.
+- **Local Storage**: All parking data, photos, and history are stored 100% locally on your device.
+- **No Analytics**: We do not track your usage or collect personal data.
+- **Permissions**:
+  - **Location**: Used only to remember where you parked.
+  - **Camera**: Used only to attach photos to your parking spot.
+  - **Notifications**: Used only to alert you when your parking timer is expiring.
+  - You can revoke these permissions at any time in your device settings.
 
 ## Getting Started
 

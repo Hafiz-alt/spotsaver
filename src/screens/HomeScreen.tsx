@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, StyleSheet, Switch, Alert, Platform, Button, Image, TouchableOpacity, AppState, TextInput } from 'react-native';
+import { View, Text, StyleSheet, Switch, Alert, Platform, Button, Image, TouchableOpacity, AppState, TextInput, ScrollView } from 'react-native';
 import { SaveButton } from '../components/SaveButton';
 import { saveSpot, getVehicles, getActiveVehicle } from '../services/storage';
 import { Vehicle } from '../models/Vehicle';
@@ -215,7 +215,11 @@ export const HomeScreen = () => {
                 <Text style={styles.headerSubtitle}>Find Your Car. Beat the Clock.</Text>
             </LinearGradient>
 
-            <View style={styles.content}>
+            <ScrollView
+                style={styles.content}
+                contentContainerStyle={styles.scrollContent}
+                showsVerticalScrollIndicator={false}
+            >
 
                 {/* Warnings */}
                 {!permissions.location && (
@@ -252,21 +256,32 @@ export const HomeScreen = () => {
                     </TouchableOpacity>
                 )}
 
-                {/* Distance Indicator */}
-                {savedSpot && distanceToSpot !== null && (
-                    <View style={styles.distanceCard}>
-                        <View style={styles.distanceIcon}>
-                            <Ionicons name="walk" size={24} color="#FF9500" />
-                        </View>
-                        <View style={styles.distanceInfo}>
-                            <Text style={styles.distanceLabel}>Distance to Vehicle</Text>
-                            <Text style={styles.distanceValue}>{formatDistance(distanceToSpot)}</Text>
-                        </View>
-                        <TouchableOpacity onPress={() => navigation.navigate('SavedSpot')}>
-                            <Ionicons name="navigate-circle" size={32} color="#007AFF" />
-                        </TouchableOpacity>
-                    </View>
+                {/* No Vehicle Prompt */}
+                {!activeVehicle && (
+                    <TouchableOpacity
+                        style={styles.noVehicleCard}
+                        onPress={() => navigation.navigate('Vehicles')}
+                        activeOpacity={0.7}
+                    >
+                        <Ionicons name="add-circle" size={24} color="#007AFF" />
+                        <Text style={styles.noVehicleText}>Add a Vehicle</Text>
+                    </TouchableOpacity>
                 )}
+
+                {/* Main Save Action */}
+                <View style={styles.mainActionArea}>
+                    <SaveButton onPress={handleSave} loading={isSaving} disabled={!permissions.location} />
+
+                    {capturedPhoto && (
+                        <View style={styles.previewContainer}>
+                            <Image source={{ uri: capturedPhoto }} style={styles.tinyPreview} />
+                            <Text style={styles.previewText}>Photo attached</Text>
+                            <TouchableOpacity onPress={() => setCapturedPhoto(null)}>
+                                <Ionicons name="close-circle" size={20} color="red" />
+                            </TouchableOpacity>
+                        </View>
+                    )}
+                </View>
 
                 {/* Parking Note Input */}
                 <View style={styles.noteInputContainer}>
@@ -289,20 +304,21 @@ export const HomeScreen = () => {
                     )}
                 </View>
 
-                {/* Main Action */}
-                <View style={styles.mainActionArea}>
-                    <SaveButton onPress={handleSave} loading={isSaving} />
-
-                    {capturedPhoto && (
-                        <View style={styles.previewContainer}>
-                            <Image source={{ uri: capturedPhoto }} style={styles.tinyPreview} />
-                            <Text style={styles.previewText}>Photo Attached</Text>
-                            <TouchableOpacity onPress={() => setCapturedPhoto(null)}>
-                                <Ionicons name="close-circle" size={20} color="red" />
-                            </TouchableOpacity>
+                {/* Saved Spot Info */}
+                {savedSpot && distanceToSpot !== null && (
+                    <View style={styles.distanceCard}>
+                        <View style={styles.distanceIcon}>
+                            <Ionicons name="walk" size={24} color="#FF9500" />
                         </View>
-                    )}
-                </View>
+                        <View style={styles.distanceInfo}>
+                            <Text style={styles.distanceLabel}>Distance to Vehicle</Text>
+                            <Text style={styles.distanceValue}>{formatDistance(distanceToSpot)}</Text>
+                        </View>
+                        <TouchableOpacity onPress={() => navigation.navigate('SavedSpot')}>
+                            <Ionicons name="navigate-circle" size={32} color="#007AFF" />
+                        </TouchableOpacity>
+                    </View>
+                )}
 
                 {/* Secondary Actions Grid */}
                 <View style={styles.menuGrid}>
@@ -345,7 +361,7 @@ export const HomeScreen = () => {
                         <Text style={styles.statusText}>Status: Parked</Text>
                     )}
                 </View>
-            </View>
+            </ScrollView>
 
             {/* Toast Notification */}
             {toastMessage && (
@@ -404,7 +420,28 @@ const styles = StyleSheet.create({
     },
     content: {
         flex: 1,
+    },
+    scrollContent: {
         padding: 20,
+        paddingBottom: 40,
+    },
+    noVehicleCard: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        justifyContent: 'center',
+        backgroundColor: '#F0F4F8',
+        padding: 16,
+        borderRadius: 16,
+        marginBottom: 20,
+        borderWidth: 2,
+        borderColor: '#007AFF',
+        borderStyle: 'dashed',
+    },
+    noVehicleText: {
+        fontSize: 16,
+        color: '#007AFF',
+        fontWeight: '600',
+        marginLeft: 10,
     },
     warningBanner: {
         flexDirection: 'row',

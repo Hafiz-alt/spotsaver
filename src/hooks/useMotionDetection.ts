@@ -11,9 +11,15 @@ export const useMotionDetection = () => {
     const [isLikelyParked, setIsLikelyParked] = useState(false);
     const [lastMoveTime, setLastMoveTime] = useState(Date.now());
 
-    useEffect(() => {
-        if (Platform.OS === 'web') return;
+    console.log('[DEBUG] useMotionDetection hook initialized, isLikelyParked:', isLikelyParked);
 
+    useEffect(() => {
+        if (Platform.OS === 'web') {
+            console.log('[DEBUG] Motion detection disabled on web');
+            return;
+        }
+
+        console.log('[DEBUG] Setting up accelerometer listener');
         Accelerometer.setUpdateInterval(500); // Check every 500ms
 
         const subscription = Accelerometer.addListener(accelerometerData => {
@@ -39,9 +45,14 @@ export const useMotionDetection = () => {
 
             if (delta > MOVE_THRESHOLD) {
                 setLastMoveTime(Date.now());
-                setIsLikelyParked(false);
+                if (isLikelyParked) {
+                    console.log('[DEBUG] Motion detected, resetting parked state. Delta:', delta);
+                    setIsLikelyParked(false);
+                }
             } else {
-                if (Date.now() - lastMoveTime > STILL_DURATION) {
+                const timeSinceMove = Date.now() - lastMoveTime;
+                if (timeSinceMove > STILL_DURATION && !isLikelyParked) {
+                    console.log('[DEBUG] Device still for', timeSinceMove, 'ms, setting isLikelyParked=true');
                     setIsLikelyParked(true);
                 }
             }

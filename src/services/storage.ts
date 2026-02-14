@@ -63,13 +63,16 @@ export const saveSpot = async (spot: Spot): Promise<void> => {
         // 1. Save as last spot
         const jsonValue = JSON.stringify(spot);
         await AsyncStorage.setItem(KEYS.LAST_SPOT, jsonValue);
+        console.log('[DEBUG] Saved last spot:', spot.id);
 
         // 2. Append to history (retrieve, prepend, save)
         const historyString = await AsyncStorage.getItem(KEYS.HISTORY);
         const history: Spot[] = historyString ? JSON.parse(historyString) : [];
+        console.log('[DEBUG] Current history length:', history.length);
 
         const newHistory = [spot, ...history];
         await AsyncStorage.setItem(KEYS.HISTORY, JSON.stringify(newHistory));
+        console.log('[DEBUG] New history length after save:', newHistory.length);
     } catch (e) {
         console.error('Error saving spot:', e);
         throw e;
@@ -89,7 +92,12 @@ export const getLastSpot = async (): Promise<Spot | null> => {
 export const getAllSpots = async (): Promise<Spot[]> => {
     try {
         const jsonValue = await AsyncStorage.getItem(KEYS.HISTORY);
-        return jsonValue != null ? JSON.parse(jsonValue) : [];
+        const spots = jsonValue != null ? JSON.parse(jsonValue) : [];
+        console.log('[DEBUG] getAllSpots returned:', spots.length, 'spots');
+        if (spots.length > 0) {
+            console.log('[DEBUG] First spot:', spots[0]);
+        }
+        return spots;
     } catch (e) {
         console.error('Error getting all spots:', e);
         return [];

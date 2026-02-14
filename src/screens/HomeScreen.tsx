@@ -116,12 +116,15 @@ export const HomeScreen = () => {
 
     // Auto-Save Effect
     React.useEffect(() => {
+        console.log('[DEBUG] Auto-save effect triggered. smartParkingEnabled:', smartParkingEnabled, 'isLikelyParked:', isLikelyParked);
         if (smartParkingEnabled && isLikelyParked) {
+            console.log('[DEBUG] Triggering auto-save prompt!');
             handleAutoPrompt();
         }
     }, [smartParkingEnabled, isLikelyParked]);
 
     const handleAutoPrompt = async () => {
+        console.log('[DEBUG] handleAutoPrompt called');
         setSmartParkingEnabled(false);
         await handleAutoSave(
             () => { /* success callback */ },

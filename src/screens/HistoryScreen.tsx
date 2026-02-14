@@ -21,14 +21,18 @@ export const HistoryScreen = () => {
         setLoading(true);
         try {
             const spots = await getAllSpots();
+            console.log('[DEBUG] HistoryScreen loaded spots:', spots.length);
+
             // Sort by newest first with defensive null checks
+            // FIXED: Don't filter out spots just because they lack an id - only filter null/undefined
             const sorted = spots
-                .filter(spot => spot && spot.id) // Filter out invalid spots
+                .filter(spot => spot != null) // Only filter out null/undefined
                 .sort((a, b) => {
                     const dateA = a.timestamp ? new Date(a.timestamp).getTime() : 0;
                     const dateB = b.timestamp ? new Date(b.timestamp).getTime() : 0;
                     return dateB - dateA;
                 });
+            console.log('[DEBUG] HistoryScreen after filter/sort:', sorted.length);
             setHistory(sorted);
         } catch (e) {
             console.error('Error loading history:', e);

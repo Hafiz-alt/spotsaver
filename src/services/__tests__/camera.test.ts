@@ -1,11 +1,17 @@
 import { requestCameraPermission, takePhoto } from '../camera';
 import * as ImagePicker from 'expo-image-picker';
+import * as ImageManipulator from 'expo-image-manipulator';
 import { Alert, Platform } from 'react-native';
 
 jest.mock('expo-image-picker', () => ({
     requestCameraPermissionsAsync: jest.fn(),
     launchCameraAsync: jest.fn(),
     MediaTypeOptions: { Images: 'Images' } // Mock enum-like object
+}));
+
+jest.mock('expo-image-manipulator', () => ({
+    manipulateAsync: jest.fn(),
+    SaveFormat: { JPEG: 'jpeg', PNG: 'png' }
 }));
 
 describe('Camera Service', () => {
@@ -25,15 +31,23 @@ describe('Camera Service', () => {
         expect(result).toBe(false);
     });
 
-    it('takePhoto returns uri when successful', async () => {
+    it('takePhoto returns compressed uri when successful', async () => {
         (ImagePicker.requestCameraPermissionsAsync as jest.Mock).mockResolvedValue({ status: 'granted' });
         (ImagePicker.launchCameraAsync as jest.Mock).mockResolvedValue({
             canceled: false,
             assets: [{ uri: 'file://test.jpg' }]
         });
+        (ImageManipulator.manipulateAsync as jest.Mock).mockResolvedValue({
+            uri: 'file://test-compressed.jpg'
+        });
 
         const uri = await takePhoto();
-        expect(uri).toBe('file://test.jpg');
+        expect(uri).toBe('file://test-compressed.jpg');
+        expect(ImageManipulator.manipulateAsync).toHaveBeenCalledWith(
+            'file://test.jpg',
+            [{ resize: { width: 1200 } }],
+            { compress: 0.6, format: 'jpeg' }
+        );
     });
 
     it('takePhoto returns null if canceled', async () => {

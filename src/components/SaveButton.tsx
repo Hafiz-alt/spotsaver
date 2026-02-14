@@ -1,16 +1,22 @@
 import React, { useRef } from 'react';
-import { TouchableOpacity, Text, StyleSheet, Animated, View } from 'react-native';
+import { TouchableOpacity, Text, StyleSheet, Animated, View, ActivityIndicator } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import { Ionicons } from '@expo/vector-icons';
+import * as Haptics from 'expo-haptics';
 
 interface SaveButtonProps {
     onPress: () => void;
+    loading?: boolean;
+    disabled?: boolean;
 }
 
-export const SaveButton: React.FC<SaveButtonProps> = ({ onPress }) => {
+export const SaveButton: React.FC<SaveButtonProps> = ({ onPress, loading = false, disabled = false }) => {
     const scaleValue = useRef(new Animated.Value(1)).current;
 
     const handlePressIn = () => {
+        if (loading || disabled) return;
+        // Light haptic feedback on press
+        Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
         Animated.spring(scaleValue, {
             toValue: 0.95,
             useNativeDriver: true,
@@ -18,6 +24,7 @@ export const SaveButton: React.FC<SaveButtonProps> = ({ onPress }) => {
     };
 
     const handlePressOut = () => {
+        if (loading || disabled) return;
         Animated.spring(scaleValue, {
             toValue: 1,
             useNativeDriver: true,
@@ -32,15 +39,25 @@ export const SaveButton: React.FC<SaveButtonProps> = ({ onPress }) => {
                 onPressOut={handlePressOut}
                 activeOpacity={0.9}
                 testID="save-button"
+                disabled={loading || disabled}
             >
                 <LinearGradient
-                    colors={['#007AFF', '#00C853']}
+                    colors={loading || disabled ? ['#999', '#666'] : ['#007AFF', '#00C853']}
                     start={{ x: 0, y: 0 }}
                     end={{ x: 1, y: 1 }}
                     style={styles.gradientButton}
                 >
-                    <Ionicons name="location" size={24} color="white" style={{ marginRight: 10 }} />
-                    <Text style={styles.text}>SAVE PARKING SPOT</Text>
+                    {loading ? (
+                        <>
+                            <ActivityIndicator size="small" color="white" style={{ marginRight: 10 }} />
+                            <Text style={styles.text}>SAVING...</Text>
+                        </>
+                    ) : (
+                        <>
+                            <Ionicons name="location" size={24} color="white" style={{ marginRight: 10 }} />
+                            <Text style={styles.text}>SAVE PARKING SPOT</Text>
+                        </>
+                    )}
                 </LinearGradient>
             </TouchableOpacity>
         </Animated.View>

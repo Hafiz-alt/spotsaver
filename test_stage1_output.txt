@@ -1,0 +1,677 @@
+﻿
+> app@1.0.0 test
+> jest
+
+node.exe : PASS src/services/__
+tests__/maps.test.ts
+At C:\Program 
+Files\nodejs\npm.ps1:29 char:3
++   & $NODE_EXE $NPM_CLI_JS 
+$args
++   
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    + CategoryInfo          : 
+NotSp    ecified: (PASS 
+src/services/__t    
+ests__/maps.test.ts:String) 
+[],     RemoteException
+    + FullyQualifiedErrorId : 
+Nativ    eCommandError
+ 
+PASS src/services/__tests__/aut
+oSave.test.ts
+PASS __tests__/utils.test.ts
+PASS src/services/__tests__/sto
+rage_history.test.ts
+PASS src/services/__tests__/not
+ifications.test.ts
+PASS src/services/__tests__/cam
+era.test.ts
+PASS src/services/__tests__/sto
+rage.test.ts
+FAIL 
+__tests__/permissions.test.ts
+  ΓùÅ Console
+
+    console.error
+      Location permission 
+error: TypeError: Location.requ
+estForegroundPermissionsAsync 
+is not a function
+          at requestForegroundP
+ermissionsAsync (C:\Users\asus\
+Downloads\Memory Parking\src\ut
+ils\permissions.ts:16:43)
+          at Generator.next 
+(<anonymous>)
+          at 
+asyncGeneratorStep (C:\Users\as
+us\Downloads\Memory Parking\nod
+e_modules\@babel\runtime\helper
+s\asyncToGenerator.js:3:17)
+          at _next (C:\Users\as
+us\Downloads\Memory Parking\nod
+e_modules\@babel\runtime\helper
+s\asyncToGenerator.js:17:9)
+          at 
+C:\Users\asus\Downloads\Memory 
+Parking\node_modules\@babel\run
+time\helpers\asyncToGenerator.j
+s:22:7
+          at new Promise 
+(<anonymous>)
+          at 
+C:\Users\asus\Downloads\Memory 
+Parking\node_modules\@babel\run
+time\helpers\asyncToGenerator.j
+s:14:12
+          at apply (C:\Users\as
+us\Downloads\Memory Parking\src
+\utils\permissions.ts:14:39)
+          at 
+Object.<anonymous> (C:\Users\as
+us\Downloads\Memory Parking\__t
+ests__\permissions.test.ts:31:5
+5)
+          at Generator.next 
+(<anonymous>)
+          at 
+asyncGeneratorStep (C:\Users\as
+us\Downloads\Memory Parking\nod
+e_modules\@babel\runtime\helper
+s\asyncToGenerator.js:3:17)
+          at _next (C:\Users\as
+us\Downloads\Memory Parking\nod
+e_modules\@babel\runtime\helper
+s\asyncToGenerator.js:17:9)
+          at 
+C:\Users\asus\Downloads\Memory 
+Parking\node_modules\@babel\run
+time\helpers\asyncToGenerator.j
+s:22:7
+          at new Promise 
+(<anonymous>)
+          at 
+Object.<anonymous> (C:\Users\as
+us\Downloads\Memory Parking\nod
+e_modules\@babel\runtime\helper
+s\asyncToGenerator.js:14:12)
+          at 
+Promise.then.completed (C:\User
+s\asus\Downloads\Memory Parking
+\node_modules\jest-circus\build
+\utils.js:298:28)
+          at new Promise 
+(<anonymous>)
+          at callAsyncCircusFn 
+(C:\Users\asus\Downloads\Memory
+ Parking\node_modules\jest-circ
+us\build\utils.js:231:10)
+          at _callCircusTest (C
+:\Users\asus\Downloads\Memory P
+arking\node_modules\jest-circus
+\build\run.js:316:40)
+          at 
+processTicksAndRejections (node
+:internal/process/task_queues:1
+05:5)
+          at _runTest (C:\Users
+\asus\Downloads\Memory Parking\
+node_modules\jest-circus\build\
+run.js:252:3)
+          at 
+_runTestsForDescribeBlock (C:\U
+sers\asus\Downloads\Memory Park
+ing\node_modules\jest-circus\bu
+ild\run.js:126:9)
+          at 
+_runTestsForDescribeBlock (C:\U
+sers\asus\Downloads\Memory Park
+ing\node_modules\jest-circus\bu
+ild\run.js:121:9)
+          at run (C:\Users\asus
+\Downloads\Memory Parking\node_
+modules\jest-circus\build\run.j
+s:71:3)
+          at runAndTransformRes
+ultsToJestFormat (C:\Users\asus
+\Downloads\Memory Parking\node_
+modules\jest-circus\build\legac
+y-code-todo-rewrite\jestAdapter
+Init.js:122:21)
+          at jestAdapter (C:\Us
+ers\asus\Downloads\Memory Parki
+ng\node_modules\jest-circus\bui
+ld\legacy-code-todo-rewrite\jes
+tAdapter.js:79:19)
+          at runTestInternal (C
+:\Users\asus\Downloads\Memory P
+arking\node_modules\jest-runner
+\build\runTest.js:367:16)
+          at runTest (C:\Users\
+asus\Downloads\Memory Parking\n
+ode_modules\jest-runner\build\r
+unTest.js:444:34)
+          at Object.worker (C:\
+Users\asus\Downloads\Memory Par
+king\node_modules\jest-runner\b
+uild\testWorker.js:106:12)
+
+    [0m [90m 17 |[39m       
+  [36mreturn[39m status 
+[33m===[39m 
+[32m'granted'[39m[33m;[39m
+     [90m 18 |[39m     } 
+[36mcatch[39m (error) {
+    [31m[1m>[22m[39m[90m 
+19 |[39m         console[33m.
+[39merror([32m'Location 
+permission 
+error:'[39m[33m,[39m 
+error)[33m;[39m
+     [90m    |[39m           
+      [31m[1m^[22m[39m
+     [90m 20 |[39m         
+[36mreturn[39m 
+[36mfalse[39m[33m;[39m
+     [90m 21 |[39m     }
+     [90m 22 |[39m 
+}[33m;[39m[0m
+
+      at error (src/utils/permi
+ssions.ts:19:17)
+      at asyncGeneratorStep (no
+de_modules/@babel/runtime/helpe
+rs/asyncToGenerator.js:3:17)
+      at _next (node_modules/@b
+abel/runtime/helpers/asyncToGen
+erator.js:17:9)
+      at node_modules/@babel/ru
+ntime/helpers/asyncToGenerator.
+js:22:7
+      at node_modules/@babel/ru
+ntime/helpers/asyncToGenerator.
+js:14:12
+      at apply (src/utils/permi
+ssions.ts:14:39)
+      at Object.<anonymous> (__
+tests__/permissions.test.ts:31:
+55)
+      at asyncGeneratorStep (no
+de_modules/@babel/runtime/helpe
+rs/asyncToGenerator.js:3:17)
+      at _next (node_modules/@b
+abel/runtime/helpers/asyncToGen
+erator.js:17:9)
+      at node_modules/@babel/ru
+ntime/helpers/asyncToGenerator.
+js:22:7
+      at Object.<anonymous> (no
+de_modules/@babel/runtime/helpe
+rs/asyncToGenerator.js:14:12)
+
+    console.error
+      Location permission 
+error: TypeError: Location.requ
+estForegroundPermissionsAsync 
+is not a function
+          at requestForegroundP
+ermissionsAsync (C:\Users\asus\
+Downloads\Memory Parking\src\ut
+ils\permissions.ts:16:43)
+          at Generator.next 
+(<anonymous>)
+          at 
+asyncGeneratorStep (C:\Users\as
+us\Downloads\Memory Parking\nod
+e_modules\@babel\runtime\helper
+s\asyncToGenerator.js:3:17)
+          at _next (C:\Users\as
+us\Downloads\Memory Parking\nod
+e_modules\@babel\runtime\helper
+s\asyncToGenerator.js:17:9)
+          at 
+C:\Users\asus\Downloads\Memory 
+Parking\node_modules\@babel\run
+time\helpers\asyncToGenerator.j
+s:22:7
+          at new Promise 
+(<anonymous>)
+          at 
+C:\Users\asus\Downloads\Memory 
+Parking\node_modules\@babel\run
+time\helpers\asyncToGenerator.j
+s:14:12
+          at apply (C:\Users\as
+us\Downloads\Memory Parking\src
+\utils\permissions.ts:14:39)
+          at 
+Object.<anonymous> (C:\Users\as
+us\Downloads\Memory Parking\__t
+ests__\permissions.test.ts:37:5
+5)
+          at Generator.next 
+(<anonymous>)
+          at 
+asyncGeneratorStep (C:\Users\as
+us\Downloads\Memory Parking\nod
+e_modules\@babel\runtime\helper
+s\asyncToGenerator.js:3:17)
+          at _next (C:\Users\as
+us\Downloads\Memory Parking\nod
+e_modules\@babel\runtime\helper
+s\asyncToGenerator.js:17:9)
+          at 
+C:\Users\asus\Downloads\Memory 
+Parking\node_modules\@babel\run
+time\helpers\asyncToGenerator.j
+s:22:7
+          at new Promise 
+(<anonymous>)
+          at 
+Object.<anonymous> (C:\Users\as
+us\Downloads\Memory Parking\nod
+e_modules\@babel\runtime\helper
+s\asyncToGenerator.js:14:12)
+          at 
+Promise.then.completed (C:\User
+s\asus\Downloads\Memory Parking
+\node_modules\jest-circus\build
+\utils.js:298:28)
+          at new Promise 
+(<anonymous>)
+          at callAsyncCircusFn 
+(C:\Users\asus\Downloads\Memory
+ Parking\node_modules\jest-circ
+us\build\utils.js:231:10)
+          at _callCircusTest (C
+:\Users\asus\Downloads\Memory P
+arking\node_modules\jest-circus
+\build\run.js:316:40)
+          at 
+processTicksAndRejections (node
+:internal/process/task_queues:1
+05:5)
+          at _runTest (C:\Users
+\asus\Downloads\Memory Parking\
+node_modules\jest-circus\build\
+run.js:252:3)
+          at 
+_runTestsForDescribeBlock (C:\U
+sers\asus\Downloads\Memory Park
+ing\node_modules\jest-circus\bu
+ild\run.js:126:9)
+          at 
+_runTestsForDescribeBlock (C:\U
+sers\asus\Downloads\Memory Park
+ing\node_modules\jest-circus\bu
+ild\run.js:121:9)
+          at run (C:\Users\asus
+\Downloads\Memory Parking\node_
+modules\jest-circus\build\run.j
+s:71:3)
+          at runAndTransformRes
+ultsToJestFormat (C:\Users\asus
+\Downloads\Memory Parking\node_
+modules\jest-circus\build\legac
+y-code-todo-rewrite\jestAdapter
+Init.js:122:21)
+          at jestAdapter (C:\Us
+ers\asus\Downloads\Memory Parki
+ng\node_modules\jest-circus\bui
+ld\legacy-code-todo-rewrite\jes
+tAdapter.js:79:19)
+          at runTestInternal (C
+:\Users\asus\Downloads\Memory P
+arking\node_modules\jest-runner
+\build\runTest.js:367:16)
+          at runTest (C:\Users\
+asus\Downloads\Memory Parking\n
+ode_modules\jest-runner\build\r
+unTest.js:444:34)
+          at Object.worker (C:\
+Users\asus\Downloads\Memory Par
+king\node_modules\jest-runner\b
+uild\testWorker.js:106:12)
+
+    [0m [90m 17 |[39m       
+  [36mreturn[39m status 
+[33m===[39m 
+[32m'granted'[39m[33m;[39m
+     [90m 18 |[39m     } 
+[36mcatch[39m (error) {
+    [31m[1m>[22m[39m[90m 
+19 |[39m         console[33m.
+[39merror([32m'Location 
+permission 
+error:'[39m[33m,[39m 
+error)[33m;[39m
+     [90m    |[39m           
+      [31m[1m^[22m[39m
+     [90m 20 |[39m         
+[36mreturn[39m 
+[36mfalse[39m[33m;[39m
+     [90m 21 |[39m     }
+     [90m 22 |[39m 
+}[33m;[39m[0m
+
+      at error (src/utils/permi
+ssions.ts:19:17)
+      at asyncGeneratorStep (no
+de_modules/@babel/runtime/helpe
+rs/asyncToGenerator.js:3:17)
+      at _next (node_modules/@b
+abel/runtime/helpers/asyncToGen
+erator.js:17:9)
+      at node_modules/@babel/ru
+ntime/helpers/asyncToGenerator.
+js:22:7
+      at node_modules/@babel/ru
+ntime/helpers/asyncToGenerator.
+js:14:12
+      at apply (src/utils/permi
+ssions.ts:14:39)
+      at Object.<anonymous> (__
+tests__/permissions.test.ts:37:
+55)
+      at asyncGeneratorStep (no
+de_modules/@babel/runtime/helpe
+rs/asyncToGenerator.js:3:17)
+      at _next (node_modules/@b
+abel/runtime/helpers/asyncToGen
+erator.js:17:9)
+      at node_modules/@babel/ru
+ntime/helpers/asyncToGenerator.
+js:22:7
+      at Object.<anonymous> (no
+de_modules/@babel/runtime/helpe
+rs/asyncToGenerator.js:14:12)
+
+    console.error
+      Error checking 
+permissions: TypeError: Locatio
+n.getForegroundPermissionsAsync
+ is not a function
+          at 
+getForegroundPermissionsAsync (
+C:\Users\asus\Downloads\Memory 
+Parking\src\utils\permissions.t
+s:50:41)
+          at Generator.next 
+(<anonymous>)
+          at 
+asyncGeneratorStep (C:\Users\as
+us\Downloads\Memory Parking\nod
+e_modules\@babel\runtime\helper
+s\asyncToGenerator.js:3:17)
+          at _next (C:\Users\as
+us\Downloads\Memory Parking\nod
+e_modules\@babel\runtime\helper
+s\asyncToGenerator.js:17:9)
+          at 
+C:\Users\asus\Downloads\Memory 
+Parking\node_modules\@babel\run
+time\helpers\asyncToGenerator.j
+s:22:7
+          at new Promise 
+(<anonymous>)
+          at 
+C:\Users\asus\Downloads\Memory 
+Parking\node_modules\@babel\run
+time\helpers\asyncToGenerator.j
+s:14:12
+          at apply (C:\Users\as
+us\Downloads\Memory Parking\src
+\utils\permissions.ts:48:36)
+          at 
+Object.<anonymous> (C:\Users\as
+us\Downloads\Memory Parking\__t
+ests__\permissions.test.ts:42:5
+2)
+          at Generator.next 
+(<anonymous>)
+          at 
+asyncGeneratorStep (C:\Users\as
+us\Downloads\Memory Parking\nod
+e_modules\@babel\runtime\helper
+s\asyncToGenerator.js:3:17)
+          at _next (C:\Users\as
+us\Downloads\Memory Parking\nod
+e_modules\@babel\runtime\helper
+s\asyncToGenerator.js:17:9)
+          at 
+C:\Users\asus\Downloads\Memory 
+Parking\node_modules\@babel\run
+time\helpers\asyncToGenerator.j
+s:22:7
+          at new Promise 
+(<anonymous>)
+          at 
+Object.<anonymous> (C:\Users\as
+us\Downloads\Memory Parking\nod
+e_modules\@babel\runtime\helper
+s\asyncToGenerator.js:14:12)
+          at 
+Promise.then.completed (C:\User
+s\asus\Downloads\Memory Parking
+\node_modules\jest-circus\build
+\utils.js:298:28)
+          at new Promise 
+(<anonymous>)
+          at callAsyncCircusFn 
+(C:\Users\asus\Downloads\Memory
+ Parking\node_modules\jest-circ
+us\build\utils.js:231:10)
+          at _callCircusTest (C
+:\Users\asus\Downloads\Memory P
+arking\node_modules\jest-circus
+\build\run.js:316:40)
+          at 
+processTicksAndRejections (node
+:internal/process/task_queues:1
+05:5)
+          at _runTest (C:\Users
+\asus\Downloads\Memory Parking\
+node_modules\jest-circus\build\
+run.js:252:3)
+          at 
+_runTestsForDescribeBlock (C:\U
+sers\asus\Downloads\Memory Park
+ing\node_modules\jest-circus\bu
+ild\run.js:126:9)
+          at 
+_runTestsForDescribeBlock (C:\U
+sers\asus\Downloads\Memory Park
+ing\node_modules\jest-circus\bu
+ild\run.js:121:9)
+          at run (C:\Users\asus
+\Downloads\Memory Parking\node_
+modules\jest-circus\build\run.j
+s:71:3)
+          at runAndTransformRes
+ultsToJestFormat (C:\Users\asus
+\Downloads\Memory Parking\node_
+modules\jest-circus\build\legac
+y-code-todo-rewrite\jestAdapter
+Init.js:122:21)
+          at jestAdapter (C:\Us
+ers\asus\Downloads\Memory Parki
+ng\node_modules\jest-circus\bui
+ld\legacy-code-todo-rewrite\jes
+tAdapter.js:79:19)
+          at runTestInternal (C
+:\Users\asus\Downloads\Memory P
+arking\node_modules\jest-runner
+\build\runTest.js:367:16)
+          at runTest (C:\Users\
+asus\Downloads\Memory Parking\n
+ode_modules\jest-runner\build\r
+unTest.js:444:34)
+          at Object.worker (C:\
+Users\asus\Downloads\Memory Par
+king\node_modules\jest-runner\b
+uild\testWorker.js:106:12)
+
+    [0m [90m 58 |[39m       
+  }[33m;[39m
+     [90m 59 |[39m     } 
+[36mcatch[39m (error) {
+    [31m[1m>[22m[39m[90m 
+60 |[39m         console[33m.
+[39merror([32m'Error 
+checking 
+permissions:'[39m[33m,[39m 
+error)[33m;[39m
+     [90m    |[39m           
+      [31m[1m^[22m[39m
+     [90m 61 |[39m         
+[36mreturn[39m {
+     [90m 62 |[39m           
+  location[33m:[39m 
+[36mfalse[39m[33m,[39m
+     [90m 63 |[39m           
+  notifications[33m:[39m 
+[36mfalse[39m[33m,[39m[0m
+
+      at error (src/utils/permi
+ssions.ts:60:17)
+      at asyncGeneratorStep (no
+de_modules/@babel/runtime/helpe
+rs/asyncToGenerator.js:3:17)
+      at _next (node_modules/@b
+abel/runtime/helpers/asyncToGen
+erator.js:17:9)
+      at node_modules/@babel/ru
+ntime/helpers/asyncToGenerator.
+js:22:7
+      at node_modules/@babel/ru
+ntime/helpers/asyncToGenerator.
+js:14:12
+      at apply (src/utils/permi
+ssions.ts:48:36)
+      at Object.<anonymous> (__
+tests__/permissions.test.ts:42:
+52)
+      at asyncGeneratorStep (no
+de_modules/@babel/runtime/helpe
+rs/asyncToGenerator.js:3:17)
+      at _next (node_modules/@b
+abel/runtime/helpers/asyncToGen
+erator.js:17:9)
+      at node_modules/@babel/ru
+ntime/helpers/asyncToGenerator.
+js:22:7
+      at Object.<anonymous> (no
+de_modules/@babel/runtime/helpe
+rs/asyncToGenerator.js:14:12)
+
+  ΓùÅ Permissions Utils ΓÇ║ 
+should result true if location 
+granted
+
+    expect(received).toBe(expec
+ted) // Object.is equality
+
+    Expected: true
+    Received: false
+
+    [0m [90m 30 |[39m     
+it([32m'should result true if 
+location 
+granted'[39m[33m,[39m 
+[36masync[39m () 
+[33m=>[39m {
+     [90m 31 |[39m         
+[36mconst[39m result 
+[33m=[39m [36mawait[39m req
+uestLocationPermission()[33m;
+[39m
+    [31m[1m>[22m[39m[90m 
+32 |[39m         expect(result
+)[33m.[39mtoBe([36mtrue[39m
+)[33m;[39m
+     [90m    |[39m           
+             
+[31m[1m^[22m[39m
+     [90m 33 |[39m     
+})[33m;[39m
+     [90m 34 |[39m
+     [90m 35 |[39m     
+it([32m'should result false 
+if location 
+denied'[39m[33m,[39m 
+[36masync[39m () 
+[33m=>[39m {[0m
+
+      at Object.toBe (__tests__
+/permissions.test.ts:32:24)
+      at asyncGeneratorStep (no
+de_modules/@babel/runtime/helpe
+rs/asyncToGenerator.js:3:17)
+      at _next (node_modules/@b
+abel/runtime/helpers/asyncToGen
+erator.js:17:9)
+
+  ΓùÅ Permissions Utils ΓÇ║ 
+should check status correctly
+
+    expect(received).toEqual(ex
+pected) // deep equality
+
+    - Expected  - 4
+    + Received  + 4
+
+    - ObjectContaining {
+    -   "camera": true,
+    -   "location": true,
+    -   "notifications": true,
+    + Object {
+    +   "camera": false,
+    +   "location": false,
+    +   "notifications": false,
+      }
+
+    [0m [90m 41 |[39m     
+it([32m'should check status 
+correctly'[39m[33m,[39m 
+[36masync[39m () 
+[33m=>[39m {
+     [90m 42 |[39m         
+[36mconst[39m status 
+[33m=[39m [36mawait[39m che
+ckPermissionsStatus()[33m;[39
+m
+    [31m[1m>[22m[39m[90m 
+43 |[39m         expect(status
+)[33m.[39mtoEqual(expect[33m
+.[39mobjectContaining({
+     [90m    |[39m           
+             
+[31m[1m^[22m[39m
+     [90m 44 |[39m           
+  location[33m:[39m 
+[36mtrue[39m[33m,[39m
+     [90m 45 |[39m           
+  notifications[33m:[39m 
+[36mtrue[39m[33m,[39m
+     [90m 46 |[39m           
+  camera[33m:[39m 
+[36mtrue[39m[0m
+
+      at Object.toEqual (__test
+s__/permissions.test.ts:43:24)
+      at asyncGeneratorStep (no
+de_modules/@babel/runtime/helpe
+rs/asyncToGenerator.js:3:17)
+      at _next (node_modules/@b
+abel/runtime/helpers/asyncToGen
+erator.js:17:9)
+
+Test Suites: 1 failed, 7 
+passed, 8 total
+Tests:       2 failed, 16 
+passed, 18 total
+Snapshots:   0 total
+Time:        2.664 s, 
+estimated 4 s
+Ran all test suites.

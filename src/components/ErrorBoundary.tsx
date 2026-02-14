@@ -1,8 +1,10 @@
-import React, { Component, ReactNode } from 'react';
-import { View, Text, StyleSheet, ScrollView } from 'react-native';
+import React, { Component, ErrorInfo, ReactNode } from 'react';
+import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
+import { Ionicons } from '@expo/vector-icons';
 
 interface Props {
     children: ReactNode;
+    fallback?: ReactNode;
 }
 
 interface State {
@@ -20,18 +22,34 @@ export class ErrorBoundary extends Component<Props, State> {
         return { hasError: true, error };
     }
 
-    componentDidCatch(error: Error, errorInfo: any) {
-        console.error("Uncaught error:", error, errorInfo);
+    componentDidCatch(error: Error, errorInfo: ErrorInfo) {
+        console.error("ErrorBoundary caught an error:", error, errorInfo);
+        // Ensure this method is implemented to satisfy interface requirements
+        // and log errors appropriately.
     }
+
+    resetError = () => {
+        this.setState({ hasError: false, error: null });
+    };
 
     render() {
         if (this.state.hasError) {
+            // If a custom fallback is provided, use it.
+            if (this.props.fallback) {
+                return this.props.fallback;
+            }
+
+            // Default fallback UI
             return (
                 <View style={styles.container}>
-                    <Text style={styles.title}>Something went wrong.</Text>
-                    <ScrollView style={styles.scroll}>
-                        <Text style={styles.error}>{this.state.error?.toString()}</Text>
-                    </ScrollView>
+                    <Ionicons name="alert-circle-outline" size={48} color="#FF3B30" />
+                    <Text style={styles.title}>Something went wrong</Text>
+                    <Text style={styles.message}>
+                        {this.state.error ? this.state.error.toString() : "An unexpected error occurred."}
+                    </Text>
+                    <TouchableOpacity style={styles.button} onPress={this.resetError}>
+                        <Text style={styles.buttonText}>Try Again</Text>
+                    </TouchableOpacity>
                 </View>
             );
         }
@@ -42,25 +60,34 @@ export class ErrorBoundary extends Component<Props, State> {
 
 const styles = StyleSheet.create({
     container: {
-        flex: 1,
         padding: 20,
-        justifyContent: 'center',
         alignItems: 'center',
-        backgroundColor: '#ffe6e6',
+        justifyContent: 'center',
+        backgroundColor: '#FFF0F0',
+        borderRadius: 8,
+        minHeight: 150,
+        margin: 10,
     },
     title: {
-        fontSize: 24,
+        fontSize: 18,
         fontWeight: 'bold',
-        marginBottom: 20,
-        color: '#cc0000',
+        color: '#333',
+        marginVertical: 10,
     },
-    scroll: {
-        maxHeight: 400,
-        width: '100%',
-    },
-    error: {
-        color: '#cc0000',
+    message: {
         fontSize: 14,
-        fontFamily: 'monospace',
+        color: '#666',
+        textAlign: 'center',
+        marginBottom: 20,
+    },
+    button: {
+        backgroundColor: '#FF3B30',
+        paddingHorizontal: 20,
+        paddingVertical: 10,
+        borderRadius: 20,
+    },
+    buttonText: {
+        color: 'white',
+        fontWeight: 'bold',
     },
 });

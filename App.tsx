@@ -9,6 +9,8 @@ import { registerRootComponent } from 'expo';
 import { ErrorBoundary } from './src/components/ErrorBoundary';
 
 import { PermissionsScreen } from './src/screens/PermissionsScreen';
+import { VehicleScreen } from './src/screens/VehicleScreen';
+import { AddVehicleScreen } from './src/screens/AddVehicleScreen';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { ActivityIndicator, View } from 'react-native';
 
@@ -52,6 +54,8 @@ function App() {
           <Stack.Screen name="SavedSpot" component={SavedSpotScreen} />
           <Stack.Screen name="Timers" component={TimersScreen} />
           <Stack.Screen name="History" component={HistoryScreen} />
+          <Stack.Screen name="Vehicles" component={VehicleScreen} options={{ headerShown: false }} />
+          <Stack.Screen name="AddVehicle" component={AddVehicleScreen} options={{ headerShown: false }} />
         </Stack.Navigator>
       </NavigationContainer>
     </ErrorBoundary>

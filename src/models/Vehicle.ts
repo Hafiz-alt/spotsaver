@@ -1,5 +1,8 @@
 export interface Vehicle {
     id: string;
     name: string;
-    isDefault: boolean;
+    plateNumber: string;
+    photoUri?: string;
+    createdAt: string;
+    isDefault?: boolean;
 }

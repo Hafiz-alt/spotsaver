@@ -1,9 +1,12 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, StyleSheet, Switch, Alert, Platform, Button, Image, TouchableOpacity, AppState } from 'react-native';
+import { View, Text, StyleSheet, Switch, Alert, Platform, Button, Image, TouchableOpacity, AppState, TextInput } from 'react-native';
 import { SaveButton } from '../components/SaveButton';
-import { saveSpot } from '../services/storage';
+import { saveSpot, getVehicles, getActiveVehicle } from '../services/storage';
+import { Vehicle } from '../models/Vehicle';
 import { checkPermissionsStatus, openSettings } from '../utils/permissions';
+import { calculateDistance, formatDistance } from '../utils/distance';
 import * as Location from 'expo-location';
+import * as Haptics from 'expo-haptics';
 
 import { useNavigation } from '@react-navigation/native';
 import { takePhoto } from '../services/camera';
@@ -17,6 +20,12 @@ export const HomeScreen = () => {
     const [capturedPhoto, setCapturedPhoto] = useState<string | null>(null);
     const [smartParkingEnabled, setSmartParkingEnabled] = useState(false);
     const [permissions, setPermissions] = useState({ location: true, notifications: true, camera: true });
+    const [activeVehicle, setActiveVehicle] = useState<Vehicle | null>(null);
+    const [parkingNote, setParkingNote] = useState('');
+    const [distanceToSpot, setDistanceToSpot] = useState<number | null>(null);
+    const [savedSpot, setSavedSpot] = useState<any>(null);
+    const [isSaving, setIsSaving] = useState(false);
+    const [toastMessage, setToastMessage] = useState<string | null>(null);
 
     const navigation = useNavigation<any>();
     const { isLikelyParked } = useMotionDetection();
@@ -41,6 +50,70 @@ export const HomeScreen = () => {
         };
     }, []);
 
+    // Load active vehicle
+    useEffect(() => {
+        loadActiveVehicle();
+    }, []);
+
+    const loadActiveVehicle = async () => {
+        try {
+            const activeId = await getActiveVehicle();
+            if (activeId) {
+                const vehicles = await getVehicles();
+                const vehicle = vehicles.find(v => v.id === activeId);
+                setActiveVehicle(vehicle || null);
+            }
+        } catch (e) {
+            console.error('Error loading active vehicle:', e);
+        }
+    };
+
+    // Load saved spot and calculate distance
+    useEffect(() => {
+        loadSavedSpot();
+    }, []);
+
+    const loadSavedSpot = async () => {
+        try {
+            const { getLastSpot } = await import('../services/storage');
+            const spot = await getLastSpot();
+            setSavedSpot(spot);
+        } catch (e) {
+            console.error('Error loading saved spot:', e);
+        }
+    };
+
+    // Calculate distance with auto-update every 10 seconds
+    useEffect(() => {
+        if (!savedSpot) {
+            setDistanceToSpot(null);
+            return;
+        }
+
+        const updateDistance = async () => {
+            try {
+                const { status } = await Location.requestForegroundPermissionsAsync();
+                if (status !== 'granted') return;
+
+                const location = await Location.getCurrentPositionAsync({});
+                const distance = calculateDistance(
+                    location.coords.latitude,
+                    location.coords.longitude,
+                    savedSpot.lat,
+                    savedSpot.lng
+                );
+                setDistanceToSpot(distance);
+            } catch (e) {
+                console.error('Error calculating distance:', e);
+            }
+        };
+
+        updateDistance();
+        const interval = setInterval(updateDistance, 10000); // Update every 10 seconds
+
+        return () => clearInterval(interval);
+    }, [savedSpot]);
+
     // Auto-Save Effect
     React.useEffect(() => {
         if (smartParkingEnabled && isLikelyParked) {
@@ -64,12 +137,11 @@ export const HomeScreen = () => {
     };
 
     const handleSave = async () => {
+        // Set loading state immediately for instant UI feedback
+        setIsSaving(true);
+
         try {
             // EAFP: Try to get location directly without pre-check.
-            // If permission is missing, this will likely throw or return error.
-            // We still try requestForegroundPermissionsAsync just in case it's a first-time prompt needed,
-            // but we don't block if it returns something weird.
-
             await import('expo-location').then(m => m.requestForegroundPermissionsAsync());
             const loc = await import('expo-location').then(m => m.getCurrentPositionAsync({}));
 
@@ -79,40 +151,39 @@ export const HomeScreen = () => {
                 lng: loc.coords.longitude,
                 timestamp: new Date().toISOString(),
                 photoPath: capturedPhoto || undefined,
+                vehicleId: activeVehicle?.id,
+                note: parkingNote.trim() || undefined,
             };
 
+            // Save spot asynchronously
             await saveSpot(spot);
 
-            // Reset photo after save
+            // Reset photo and note after save
             setCapturedPhoto(null);
+            setParkingNote('');
 
-            if (Platform.OS === 'web') {
-                window.alert('Spot Saved Successfully!');
-            } else {
-                Alert.alert(
-                    'Success',
-                    'Spot Saved Successfully!',
-                    [
-                        { text: 'OK' },
-                        {
-                            text: 'View Spot',
-                            onPress: () => navigation.navigate('SavedSpot')
-                        }
-                    ]
-                );
-            }
+            // Reload saved spot for distance calculation
+            await loadSavedSpot();
+
+            // Haptic feedback for success
+            Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
+
+            // Show success toast instead of blocking alert
+            showToast('✓ Spot Saved Successfully!');
+
         } catch (error) {
-            console.error(error);
-            // Only alert if we really failed to get location
-            Alert.alert(
-                'Location Error',
-                'Failed to get location. Please ensure Location is enabled in Settings.',
-                [
-                    { text: 'Cancel', style: 'cancel' },
-                    { text: 'Open Settings', onPress: openSettings }
-                ]
-            );
+            console.error('Error saving spot:', error);
+            showToast('✗ Failed to save spot');
+        } finally {
+            // Always reset loading state
+            setIsSaving(false);
         }
+    };
+
+    // Simple toast notification function
+    const showToast = (message: string) => {
+        setToastMessage(message);
+        setTimeout(() => setToastMessage(null), 3000); // Auto-dismiss after 3 seconds
     };
 
     const renderMenuCard = (title: string, icon: keyof typeof Ionicons.glyphMap, onPress: () => void, color: string = '#333') => (
@@ -157,9 +228,67 @@ export const HomeScreen = () => {
                     </TouchableOpacity>
                 )}
 
+                {/* Active Vehicle Display */}
+                {activeVehicle && (
+                    <TouchableOpacity
+                        style={styles.vehicleCard}
+                        onPress={() => navigation.navigate('Vehicles')}
+                        activeOpacity={0.7}
+                    >
+                        <View style={styles.vehicleCardContent}>
+                            <View style={styles.vehicleIcon}>
+                                <Ionicons name="car" size={24} color="#007AFF" />
+                            </View>
+                            <View style={styles.vehicleDetails}>
+                                <Text style={styles.vehicleLabel}>Active Vehicle</Text>
+                                <Text style={styles.vehicleName}>{activeVehicle.name}</Text>
+                                <Text style={styles.vehiclePlate}>{activeVehicle.plateNumber}</Text>
+                            </View>
+                            <Ionicons name="chevron-forward" size={20} color="#ccc" />
+                        </View>
+                    </TouchableOpacity>
+                )}
+
+                {/* Distance Indicator */}
+                {savedSpot && distanceToSpot !== null && (
+                    <View style={styles.distanceCard}>
+                        <View style={styles.distanceIcon}>
+                            <Ionicons name="walk" size={24} color="#FF9500" />
+                        </View>
+                        <View style={styles.distanceInfo}>
+                            <Text style={styles.distanceLabel}>Distance to Vehicle</Text>
+                            <Text style={styles.distanceValue}>{formatDistance(distanceToSpot)}</Text>
+                        </View>
+                        <TouchableOpacity onPress={() => navigation.navigate('SavedSpot')}>
+                            <Ionicons name="navigate-circle" size={32} color="#007AFF" />
+                        </TouchableOpacity>
+                    </View>
+                )}
+
+                {/* Parking Note Input */}
+                <View style={styles.noteInputContainer}>
+                    <View style={styles.noteHeader}>
+                        <Ionicons name="document-text-outline" size={20} color="#666" />
+                        <Text style={styles.noteLabel}>Parking Notes (Optional)</Text>
+                    </View>
+                    <TextInput
+                        style={styles.noteInput}
+                        placeholder="e.g., Basement B2, Near Lift, Section A"
+                        placeholderTextColor="#999"
+                        value={parkingNote}
+                        onChangeText={setParkingNote}
+                        multiline
+                        numberOfLines={2}
+                        maxLength={150}
+                    />
+                    {parkingNote.length > 0 && (
+                        <Text style={styles.charCount}>{parkingNote.length}/150</Text>
+                    )}
+                </View>
+
                 {/* Main Action */}
                 <View style={styles.mainActionArea}>
-                    <SaveButton onPress={handleSave} />
+                    <SaveButton onPress={handleSave} loading={isSaving} />
 
                     {capturedPhoto && (
                         <View style={styles.previewContainer}>
@@ -214,6 +343,15 @@ export const HomeScreen = () => {
                     )}
                 </View>
             </View>
+
+            {/* Toast Notification */}
+            {toastMessage && (
+                <View style={styles.toastContainer}>
+                    <View style={styles.toast}>
+                        <Text style={styles.toastText}>{toastMessage}</Text>
+                    </View>
+                </View>
+            )}
         </View>
     );
 };
@@ -396,5 +534,146 @@ const styles = StyleSheet.create({
         fontSize: 12,
         fontWeight: 'bold',
         marginTop: 8,
+    },
+    vehicleCard: {
+        backgroundColor: 'white',
+        borderRadius: 16,
+        padding: 15,
+        marginBottom: 20,
+        elevation: 2,
+        shadowColor: '#000',
+        shadowOffset: { width: 0, height: 2 },
+        shadowOpacity: 0.1,
+        shadowRadius: 4,
+    },
+    vehicleCardContent: {
+        flexDirection: 'row',
+        alignItems: 'center',
+    },
+    vehicleIcon: {
+        width: 48,
+        height: 48,
+        borderRadius: 24,
+        backgroundColor: '#E6F2FF',
+        justifyContent: 'center',
+        alignItems: 'center',
+        marginRight: 15,
+    },
+    vehicleDetails: {
+        flex: 1,
+    },
+    vehicleLabel: {
+        fontSize: 12,
+        color: '#999',
+        marginBottom: 4,
+    },
+    vehicleName: {
+        fontSize: 16,
+        fontWeight: 'bold',
+        color: '#333',
+        marginBottom: 2,
+    },
+    vehiclePlate: {
+        fontSize: 14,
+        color: '#666',
+        fontFamily: Platform.OS === 'ios' ? 'Courier' : 'monospace',
+        fontWeight: '600',
+    },
+    noteInputContainer: {
+        backgroundColor: 'white',
+        borderRadius: 16,
+        padding: 15,
+        marginBottom: 20,
+        elevation: 2,
+        shadowColor: '#000',
+        shadowOffset: { width: 0, height: 2 },
+        shadowOpacity: 0.1,
+        shadowRadius: 4,
+    },
+    noteHeader: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        marginBottom: 10,
+    },
+    noteLabel: {
+        fontSize: 14,
+        fontWeight: '600',
+        color: '#666',
+        marginLeft: 8,
+    },
+    noteInput: {
+        backgroundColor: '#F7F9FC',
+        borderRadius: 12,
+        padding: 12,
+        fontSize: 15,
+        color: '#333',
+        minHeight: 60,
+        textAlignVertical: 'top',
+    },
+    charCount: {
+        fontSize: 12,
+        color: '#999',
+        textAlign: 'right',
+        marginTop: 5,
+    },
+    distanceCard: {
+        backgroundColor: 'white',
+        borderRadius: 16,
+        padding: 15,
+        marginBottom: 20,
+        elevation: 2,
+        shadowColor: '#000',
+        shadowOffset: { width: 0, height: 2 },
+        shadowOpacity: 0.1,
+        shadowRadius: 4,
+        flexDirection: 'row',
+        alignItems: 'center',
+    },
+    distanceIcon: {
+        width: 48,
+        height: 48,
+        borderRadius: 24,
+        backgroundColor: '#FFF3E0',
+        justifyContent: 'center',
+        alignItems: 'center',
+        marginRight: 15,
+    },
+    distanceInfo: {
+        flex: 1,
+    },
+    distanceLabel: {
+        fontSize: 12,
+        color: '#999',
+        marginBottom: 4,
+    },
+    distanceValue: {
+        fontSize: 20,
+        fontWeight: 'bold',
+        color: '#FF9500',
+    },
+    toastContainer: {
+        position: 'absolute',
+        bottom: 100,
+        left: 0,
+        right: 0,
+        alignItems: 'center',
+        zIndex: 1000,
+    },
+    toast: {
+        backgroundColor: 'rgba(0, 0, 0, 0.85)',
+        paddingHorizontal: 24,
+        paddingVertical: 14,
+        borderRadius: 25,
+        elevation: 8,
+        shadowColor: '#000',
+        shadowOffset: { width: 0, height: 4 },
+        shadowOpacity: 0.3,
+        shadowRadius: 8,
+    },
+    toastText: {
+        color: 'white',
+        fontSize: 16,
+        fontWeight: '600',
+        textAlign: 'center',
     },
 });

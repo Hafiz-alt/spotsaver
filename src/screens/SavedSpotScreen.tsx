@@ -1,16 +1,17 @@
 import React, { useCallback, useState } from 'react';
-import { View, Text, StyleSheet, Button, ActivityIndicator, ScrollView, Image, TouchableOpacity, Platform } from 'react-native';
+import { View, Text, StyleSheet, ActivityIndicator, ScrollView, Image, TouchableOpacity, Platform, Alert, Linking } from 'react-native';
 import { useFocusEffect, useNavigation } from '@react-navigation/native';
 import { getLastSpot } from '../services/storage';
 import { Spot } from '../models/Spot';
-import { MapViewSpot } from '../components/MapViewSpot';
-import { openWalkingDirections } from '../services/maps';
 import { LinearGradient } from 'expo-linear-gradient';
 import { Ionicons } from '@expo/vector-icons';
+import { ErrorBoundary } from '../components/ErrorBoundary';
 
 export const SavedSpotScreen = ({ route }: any) => {
     const [spot, setSpot] = useState<Spot | null>(null);
     const [loading, setLoading] = useState(true);
+    const [error, setError] = useState<string | null>(null);
+
     // @ts-ignore
     const routeSpot = route.params?.spot;
     const navigation = useNavigation<any>();
@@ -21,21 +22,34 @@ export const SavedSpotScreen = ({ route }: any) => {
 
             const fetchSpot = async () => {
                 setLoading(true);
+                setError(null);
                 try {
-                    // If passed via params (from History), use that.
+                    // 1. If passed via params (from History), use that.
                     if (routeSpot) {
-                        if (isActive) setSpot(routeSpot);
-                        setLoading(false);
+                        if (isActive) {
+                            if (!routeSpot.id) {
+                                console.warn("SavedSpotScreen: Received invalid spot from route (missing id)");
+                                // Don't fail hard, just try storage or error out?
+                                // Let's set it but assume it might be partial.
+                            }
+                            setSpot(routeSpot);
+                        }
                         return;
                     }
 
-                    // Otherwise fetch last saved
+                    // 2. Otherwise fetch last saved
                     const lastSpot = await getLastSpot();
+
                     if (isActive) {
-                        setSpot(lastSpot);
+                        if (lastSpot) {
+                            setSpot(lastSpot);
+                        } else {
+                            setSpot(null);
+                        }
                     }
-                } catch (e) {
-                    console.error(e);
+                } catch (e: any) {
+                    console.error('SavedSpotScreen: Error loading spot', e);
+                    if (isActive) setError("Failed to load saved spot.");
                 } finally {
                     if (isActive) {
                         setLoading(false);
@@ -51,9 +65,35 @@ export const SavedSpotScreen = ({ route }: any) => {
         }, [routeSpot])
     );
 
-    const handleNavigate = () => {
-        if (spot) {
-            openWalkingDirections(spot.lat, spot.lng);
+    const openGoogleMaps = () => {
+        try {
+            if (spot && typeof spot.lat === 'number' && typeof spot.lng === 'number') {
+                const url = `https://www.google.com/maps/search/?api=1&query=${spot.lat},${spot.lng}`;
+                Linking.openURL(url).catch(err => {
+                    console.error("Couldn't open Google Maps", err);
+                    Alert.alert("Error", "Could not open Google Maps.");
+                });
+            } else {
+                Alert.alert("Error", "Location data unavailable.");
+            }
+        } catch (err) {
+            Alert.alert("Error", "An unexpected error occurred opening maps.");
+        }
+    };
+
+    const openWaze = () => {
+        try {
+            if (spot && typeof spot.lat === 'number' && typeof spot.lng === 'number') {
+                const url = `https://waze.com/ul?ll=${spot.lat},${spot.lng}&navigate=yes`;
+                Linking.openURL(url).catch(err => {
+                    console.error("Couldn't open Waze", err);
+                    Alert.alert("Error", "Could not open Waze.");
+                });
+            } else {
+                Alert.alert("Error", "Location data unavailable.");
+            }
+        } catch (err) {
+            Alert.alert("Error", "An unexpected error occurred opening Waze.");
         }
     };
 
@@ -65,6 +105,57 @@ export const SavedSpotScreen = ({ route }: any) => {
         );
     }
 
+    if (error) {
+        return (
+            <View style={styles.container}>
+                <LinearGradient colors={['#001A33', '#003366']} style={styles.header}>
+                    <TouchableOpacity onPress={() => navigation.goBack()} style={styles.backButton}>
+                        <Ionicons name="arrow-back" size={24} color="white" />
+                    </TouchableOpacity>
+                    <Text style={styles.headerTitle}>Error</Text>
+                </LinearGradient>
+                <View style={styles.emptyContainer}>
+                    <Ionicons name="alert-circle-outline" size={64} color="#FF3B30" />
+                    <Text style={[styles.emptyText, { color: '#FF3B30' }]}>{error}</Text>
+                    <TouchableOpacity style={styles.homeButton} onPress={() => navigation.navigate('Home')}>
+                        <Text style={styles.homeButtonText}>Go Home</Text>
+                    </TouchableOpacity>
+                </View>
+            </View>
+        );
+    }
+
+    // Wrap the content in ErrorBoundary to catch any render-time crashes
+    return (
+        <ErrorBoundary fallback={
+            <View style={styles.container}>
+                <LinearGradient colors={['#001A33', '#003366']} style={styles.header}>
+                    <TouchableOpacity onPress={() => navigation.goBack()} style={styles.backButton}>
+                        <Ionicons name="arrow-back" size={24} color="white" />
+                    </TouchableOpacity>
+                    <Text style={styles.headerTitle}>Something went wrong</Text>
+                </LinearGradient>
+                <View style={styles.emptyContainer}>
+                    <Ionicons name="alert-circle-outline" size={64} color="#FF3B30" />
+                    <Text style={styles.emptyText}>An unexpected error occurred.</Text>
+                    <TouchableOpacity style={styles.homeButton} onPress={() => navigation.navigate('Home')}>
+                        <Text style={styles.homeButtonText}>Go Home</Text>
+                    </TouchableOpacity>
+                </View>
+            </View>
+        }>
+            <SavedSpotContent
+                spot={spot}
+                navigation={navigation}
+                openGoogleMaps={openGoogleMaps}
+                openWaze={openWaze}
+            />
+        </ErrorBoundary>
+    );
+};
+
+// Separated component for cleaner ErrorBoundary wrapping
+const SavedSpotContent = ({ spot, navigation, openGoogleMaps, openWaze }: any) => {
     if (!spot) {
         return (
             <View style={styles.container}>
@@ -85,6 +176,10 @@ export const SavedSpotScreen = ({ route }: any) => {
         );
     }
 
+    // Safe Photo URI check
+    const hasPhoto = !!spot.photoPath && typeof spot.photoPath === 'string' && spot.photoPath.trim().length > 0;
+    const hasLocation = typeof spot.lat === 'number' && typeof spot.lng === 'number';
+
     return (
         <View style={styles.container}>
             <LinearGradient colors={['#001A33', '#003366']} style={styles.header}>
@@ -96,9 +191,13 @@ export const SavedSpotScreen = ({ route }: any) => {
 
             <ScrollView contentContainerStyle={styles.scrollContainer}>
                 {/* Photo Card */}
-                {spot.photoPath ? (
+                {hasPhoto ? (
                     <View style={styles.card}>
-                        <Image source={{ uri: spot.photoPath }} style={styles.photo} />
+                        <Image
+                            source={{ uri: spot.photoPath }}
+                            style={styles.photo}
+                            onError={(e) => console.warn("Image load error", e.nativeEvent.error)}
+                        />
                         <View style={styles.photoLabel}>
                             <Ionicons name="camera" size={14} color="white" style={{ marginRight: 4 }} />
                             <Text style={{ color: 'white', fontSize: 12 }}>Attached Photo</Text>
@@ -106,62 +205,91 @@ export const SavedSpotScreen = ({ route }: any) => {
                     </View>
                 ) : null}
 
-                {/* Map Card */}
+                {/* Location Info Card */}
                 <View style={styles.card}>
-                    <View style={styles.mapHeader}>
-                        <Ionicons name="map" size={20} color="#007AFF" />
-                        <Text style={styles.cardTitle}>Location</Text>
+                    <View style={styles.cardHeader}>
+                        <Ionicons name="location" size={20} color="#007AFF" />
+                        <Text style={styles.cardTitle}>Location Details</Text>
                     </View>
-                    <View style={styles.mapContainer}>
-                        <MapViewSpot
-                            lat={spot.lat}
-                            lng={spot.lng}
-                            note={spot.note}
-                            timestamp={spot.timestamp}
-                        />
-                    </View>
-                    <View style={styles.coordsRow}>
-                        <Text style={styles.coordsText}>{spot.lat.toFixed(6)}, {spot.lng.toFixed(6)}</Text>
+
+                    <View style={styles.infoContent}>
+                        {/* Date/Time */}
+                        <View style={styles.infoRow}>
+                            <View style={styles.iconBox}>
+                                <Ionicons name="time" size={24} color="#FF9500" />
+                            </View>
+                            <View>
+                                <Text style={styles.infoLabel}>Saved At</Text>
+                                <Text style={styles.infoValue}>
+                                    {spot.timestamp ? new Date(spot.timestamp).toLocaleString() : 'Unknown date'}
+                                </Text>
+                            </View>
+                        </View>
+
+                        {/* Coordinates */}
+                        <View style={[styles.infoRow, { marginTop: 10 }]}>
+                            <View style={[styles.iconBox, { backgroundColor: '#E3F2FD' }]}>
+                                <Ionicons name="compass" size={24} color="#007AFF" />
+                            </View>
+                            <View>
+                                <Text style={styles.infoLabel}>Coordinates</Text>
+                                {hasLocation ? (
+                                    <Text style={styles.infoValue}>{spot.lat.toFixed(6)}, {spot.lng.toFixed(6)}</Text>
+                                ) : (
+                                    <Text style={[styles.infoValue, { color: '#FF3B30' }]}>Location data unavailable</Text>
+                                )}
+                            </View>
+                        </View>
+
+                        {/* Note */}
+                        {spot.note ? (
+                            <View style={[styles.infoRow, { borderTopWidth: 1, borderTopColor: '#f0f0f0', paddingTop: 15, marginTop: 10 }]}>
+                                <View style={[styles.iconBox, { backgroundColor: '#f0f0f0' }]}>
+                                    <Ionicons name="text" size={24} color="#666" />
+                                </View>
+                                <View style={{ flex: 1 }}>
+                                    <Text style={styles.infoLabel}>Notes</Text>
+                                    <Text style={styles.infoValue}>{spot.note}</Text>
+                                </View>
+                            </View>
+                        ) : null}
                     </View>
                 </View>
 
-                {/* Info Card */}
-                <View style={[styles.card, styles.infoCard]}>
-                    <View style={styles.infoRow}>
-                        <View style={styles.iconBox}>
-                            <Ionicons name="time" size={24} color="#FF9500" />
-                        </View>
-                        <View>
-                            <Text style={styles.infoLabel}>Saved At</Text>
-                            <Text style={styles.infoValue}>{new Date(spot.timestamp).toLocaleString()}</Text>
-                        </View>
+                {/* External Navigation Buttons */}
+                {hasLocation && (
+                    <View style={styles.buttonContainer}>
+                        <TouchableOpacity onPress={openGoogleMaps} activeOpacity={0.8} style={styles.actionButtonWrapper}>
+                            <LinearGradient
+                                colors={['#4285F4', '#34A853']}
+                                start={{ x: 0, y: 0 }}
+                                end={{ x: 1, y: 0 }}
+                                style={styles.actionButton}
+                            >
+                                <Ionicons name="map" size={24} color="white" style={{ marginRight: 10 }} />
+                                <Text style={styles.actionButtonText}>Open in Google Maps</Text>
+                            </LinearGradient>
+                        </TouchableOpacity>
+
+                        <TouchableOpacity onPress={openWaze} activeOpacity={0.8} style={styles.actionButtonWrapper}>
+                            <LinearGradient
+                                colors={['#33CCFF', '#0099FF']} // Waze-like colors
+                                start={{ x: 0, y: 0 }}
+                                end={{ x: 1, y: 0 }}
+                                style={styles.actionButton}
+                            >
+                                <Ionicons name="car-sport" size={24} color="white" style={{ marginRight: 10 }} />
+                                <Text style={styles.actionButtonText}>Open in Waze</Text>
+                            </LinearGradient>
+                        </TouchableOpacity>
                     </View>
+                )}
 
-                    {spot.note && (
-                        <View style={[styles.infoRow, { borderTopWidth: 1, borderTopColor: '#f0f0f0', paddingTop: 15 }]}>
-                            <View style={[styles.iconBox, { backgroundColor: '#f0f0f0' }]}>
-                                <Ionicons name="text" size={24} color="#666" />
-                            </View>
-                            <View style={{ flex: 1 }}>
-                                <Text style={styles.infoLabel}>Notes</Text>
-                                <Text style={styles.infoValue}>{spot.note}</Text>
-                            </View>
-                        </View>
-                    )}
-                </View>
-
-                {/* Action Button */}
-                <TouchableOpacity onPress={handleNavigate} activeOpacity={0.8}>
-                    <LinearGradient
-                        colors={['#007AFF', '#00C853']}
-                        start={{ x: 0, y: 0 }}
-                        end={{ x: 1, y: 0 }}
-                        style={styles.navigateButton}
-                    >
-                        <Ionicons name="navigate" size={24} color="white" style={{ marginRight: 10 }} />
-                        <Text style={styles.navigateText}>Navigate to Car</Text>
-                    </LinearGradient>
-                </TouchableOpacity>
+                {!hasLocation && (
+                    <View style={styles.fallbackBox}>
+                        <Text style={styles.fallbackText}>Navigation is disabled because location data is missing.</Text>
+                    </View>
+                )}
 
             </ScrollView>
         </View>
@@ -212,7 +340,7 @@ const styles = StyleSheet.create({
     },
     photo: {
         width: '100%',
-        height: 200,
+        height: 250,
         resizeMode: 'cover',
     },
     photoLabel: {
@@ -226,7 +354,7 @@ const styles = StyleSheet.create({
         flexDirection: 'row',
         alignItems: 'center',
     },
-    mapHeader: {
+    cardHeader: {
         flexDirection: 'row',
         alignItems: 'center',
         padding: 15,
@@ -239,21 +367,7 @@ const styles = StyleSheet.create({
         marginLeft: 10,
         color: '#333',
     },
-    mapContainer: {
-        height: 200,
-        width: '100%',
-    },
-    coordsRow: {
-        padding: 10,
-        backgroundColor: '#f9f9f9',
-        alignItems: 'center',
-    },
-    coordsText: {
-        fontSize: 12,
-        color: '#666',
-        fontFamily: Platform.OS === 'ios' ? 'Courier' : 'monospace',
-    },
-    infoCard: {
+    infoContent: {
         padding: 20,
     },
     infoRow: {
@@ -282,19 +396,25 @@ const styles = StyleSheet.create({
         color: '#333',
         fontWeight: '500',
     },
-    navigateButton: {
+    buttonContainer: {
+        marginTop: 10,
+    },
+    actionButtonWrapper: {
+        marginBottom: 15,
+    },
+    actionButton: {
         flexDirection: 'row',
         height: 56,
         borderRadius: 28,
         justifyContent: 'center',
         alignItems: 'center',
         elevation: 5,
-        shadowColor: '#00C853',
+        shadowColor: '#000',
         shadowOffset: { width: 0, height: 4 },
-        shadowOpacity: 0.3,
-        shadowRadius: 8,
+        shadowOpacity: 0.2,
+        shadowRadius: 5,
     },
-    navigateText: {
+    actionButtonText: {
         fontSize: 18,
         fontWeight: 'bold',
         color: 'white',
@@ -310,6 +430,7 @@ const styles = StyleSheet.create({
         color: '#666',
         marginTop: 20,
         marginBottom: 30,
+        textAlign: 'center'
     },
     homeButton: {
         paddingVertical: 12,
@@ -321,4 +442,15 @@ const styles = StyleSheet.create({
         color: 'white',
         fontWeight: 'bold',
     },
+    fallbackBox: {
+        padding: 20,
+        backgroundColor: '#FFF0F0',
+        borderRadius: 12,
+        alignItems: 'center',
+        marginTop: 10
+    },
+    fallbackText: {
+        color: '#FF3B30',
+        textAlign: 'center'
+    }
 });

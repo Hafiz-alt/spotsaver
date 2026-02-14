@@ -21,11 +21,18 @@ export const HistoryScreen = () => {
         setLoading(true);
         try {
             const spots = await getAllSpots();
-            // Sort by new first
-            const sorted = spots.sort((a, b) => new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime());
+            // Sort by newest first with defensive null checks
+            const sorted = spots
+                .filter(spot => spot && spot.id) // Filter out invalid spots
+                .sort((a, b) => {
+                    const dateA = a.timestamp ? new Date(a.timestamp).getTime() : 0;
+                    const dateB = b.timestamp ? new Date(b.timestamp).getTime() : 0;
+                    return dateB - dateA;
+                });
             setHistory(sorted);
         } catch (e) {
-            console.error(e);
+            console.error('Error loading history:', e);
+            setHistory([]); // Set empty array on error
         } finally {
             setLoading(false);
         }

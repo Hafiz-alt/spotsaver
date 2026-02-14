@@ -26,6 +26,10 @@ function App() {
 
   const checkFirstLaunch = async () => {
     try {
+      // Run storage migration first
+      const { migrateStorage } = await import('./src/services/storage');
+      await migrateStorage();
+
       const hasFinished = await AsyncStorage.getItem('hasFinishedOnboarding');
       if (hasFinished !== 'true') {
         setInitialRoute('Permissions');

@@ -7,6 +7,55 @@ const KEYS = {
     HISTORY: 'memory_parking_history',
     VEHICLES: 'memory_parking_vehicles',
     ACTIVE_VEHICLE: 'memory_parking_active_vehicle',
+    MIGRATION_VERSION: 'memory_parking_migration_version',
+};
+
+const CURRENT_MIGRATION_VERSION = 1;
+
+/**
+ * Migrate storage data to handle schema changes
+ * Version 1: Add vehicleId field to existing spots
+ */
+export const migrateStorage = async (): Promise<void> => {
+    try {
+        const versionStr = await AsyncStorage.getItem(KEYS.MIGRATION_VERSION);
+        const currentVersion = versionStr ? parseInt(versionStr, 10) : 0;
+
+        if (currentVersion >= CURRENT_MIGRATION_VERSION) {
+            return; // Already migrated
+        }
+
+        console.log(`Migrating storage from version ${currentVersion} to ${CURRENT_MIGRATION_VERSION}`);
+
+        // Migration 1: Add vehicleId to spots
+        if (currentVersion < 1) {
+            const lastSpotStr = await AsyncStorage.getItem(KEYS.LAST_SPOT);
+            if (lastSpotStr) {
+                const lastSpot = JSON.parse(lastSpotStr);
+                if (!lastSpot.vehicleId) {
+                    lastSpot.vehicleId = null;
+                    await AsyncStorage.setItem(KEYS.LAST_SPOT, JSON.stringify(lastSpot));
+                }
+            }
+
+            const historyStr = await AsyncStorage.getItem(KEYS.HISTORY);
+            if (historyStr) {
+                const history: Spot[] = JSON.parse(historyStr);
+                const migratedHistory = history.map(spot => ({
+                    ...spot,
+                    vehicleId: spot.vehicleId || null
+                }));
+                await AsyncStorage.setItem(KEYS.HISTORY, JSON.stringify(migratedHistory));
+            }
+        }
+
+        // Save new migration version
+        await AsyncStorage.setItem(KEYS.MIGRATION_VERSION, CURRENT_MIGRATION_VERSION.toString());
+        console.log('Storage migration complete');
+    } catch (error) {
+        console.error('Storage migration failed:', error);
+        // Don't throw - allow app to continue even if migration fails
+    }
 };
 
 export const saveSpot = async (spot: Spot): Promise<void> => {

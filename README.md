@@ -250,7 +250,7 @@ This project is licensed under the MIT License - see the [LICENSE](./LICENSE) fi
 **Hafiz**
 - MCA Student | Mobile App Developer
 - Building real-world solutions for everyday problems
-- 📧 Email: [your-email@example.com](mailto:your-email@example.com)
+- 📧 Email: hafizmdph88172@gmail.com
 - 💼 GitHub: [@Hafiz-alt](https://github.com/Hafiz-alt)
 
 ---

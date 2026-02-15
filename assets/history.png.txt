@@ -1,3 +1,0 @@
-PLACEHOLDER - Replace with actual history screen screenshot
-Recommended size: 1080x2340 (9:19.5 aspect ratio)
-Should show: List of parking history entries with dates, times, and thumbnails

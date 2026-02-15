@@ -1,3 +1,0 @@
-PLACEHOLDER - Replace with actual vehicle screen screenshot
-Recommended size: 1080x2340 (9:19.5 aspect ratio)
-Should show: Vehicle list with photos, names, plate numbers, and active badge

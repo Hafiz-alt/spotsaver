@@ -1,0 +1,22 @@
+PLACEHOLDER - Social Preview Image for GitHub Repository
+
+Recommended size: 1280x640 pixels
+
+This image will appear when sharing the repository link on social media.
+
+Suggested content:
+- SpotSaver logo/icon
+- Tagline: "Find Your Car. Beat the Clock."
+- App screenshot or mockup
+- Clean, professional design with brand colors (dark blue #001A33, green #00C853)
+
+To set this as your repository's social preview:
+1. Go to repository Settings on GitHub
+2. Scroll to "Social preview"
+3. Upload this image (1280x640px)
+
+You can create this image using:
+- Canva (canva.com)
+- Figma (figma.com)
+- Adobe Photoshop
+- Any graphic design tool

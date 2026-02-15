@@ -1,0 +1,3 @@
+PLACEHOLDER - Replace with actual save screen screenshot
+Recommended size: 1080x2340 (9:19.5 aspect ratio)
+Should show: Photo preview, parking notes input, and Save Spot button

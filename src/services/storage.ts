@@ -60,18 +60,21 @@ export const migrateStorage = async (): Promise<void> => {
 
 export const saveSpot = async (spot: Spot): Promise<void> => {
     try {
-        // 1. Save as last spot
-        const jsonValue = JSON.stringify(spot);
-        await AsyncStorage.setItem(KEYS.LAST_SPOT, jsonValue);
-        console.log('[DEBUG] Saved last spot:', spot.id);
-
-        // 2. Append to history (retrieve, prepend, save)
+        // Retrieve history first
         const historyString = await AsyncStorage.getItem(KEYS.HISTORY);
         const history: Spot[] = historyString ? JSON.parse(historyString) : [];
         console.log('[DEBUG] Current history length:', history.length);
 
+        // Prepare new history
         const newHistory = [spot, ...history];
-        await AsyncStorage.setItem(KEYS.HISTORY, JSON.stringify(newHistory));
+
+        // Batch save both last spot and history in a single operation
+        await AsyncStorage.multiSet([
+            [KEYS.LAST_SPOT, JSON.stringify(spot)],
+            [KEYS.HISTORY, JSON.stringify(newHistory)]
+        ]);
+
+        console.log('[DEBUG] Saved last spot:', spot.id);
         console.log('[DEBUG] New history length after save:', newHistory.length);
     } catch (e) {
         console.error('Error saving spot:', e);

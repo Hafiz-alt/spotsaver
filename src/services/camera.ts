@@ -25,8 +25,8 @@ const compressImage = async (uri: string): Promise<string> => {
     try {
         const manipResult = await ImageManipulator.manipulateAsync(
             uri,
-            [{ resize: { width: 1200 } }], // Max width 1200px, maintains aspect ratio
-            { compress: 0.6, format: ImageManipulator.SaveFormat.JPEG }
+            [{ resize: { width: 800 } }], // Max width 800px for faster processing
+            { compress: 0.5, format: ImageManipulator.SaveFormat.JPEG } // More aggressive compression
         );
         return manipResult.uri;
     } catch (error) {
@@ -44,7 +44,7 @@ export const takePhoto = async (): Promise<string | null> => {
 
         const result = await ImagePicker.launchCameraAsync({
             mediaTypes: ['images'],
-            quality: 0.8, // Initial quality (will be compressed further)
+            quality: 0.6, // Lower initial quality for faster capture (compressed further)
             allowsEditing: false,
         });
 

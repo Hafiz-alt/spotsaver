@@ -133,7 +133,7 @@ export const HomeScreen = () => {
     };
 
     const handleCamera = async () => {
-        const uri = await takePhoto();
+        const uri = await takePhoto(); // Already compressed in camera.ts
         if (uri) {
             setCapturedPhoto(uri);
         }
